@@ -1,3 +1,4 @@
+use std::collections::BTreeMap;
 use std::fs::File;
 use std::io::prelude::*;
 use std::str::FromStr;
@@ -7,7 +8,9 @@ fn main() -> std::io::Result<()> {
     let mut buffer = String::from("");
     let _n = file.read_to_string(&mut buffer)?;
 
-    let mut max = 0;
+    // let mut max = 0;
+
+    let mut treemap = BTreeMap::<i32, i32>::new();
 
     let elves = buffer.split("\n\n");
 
@@ -26,14 +29,23 @@ fn main() -> std::io::Result<()> {
             }
         });
 
-        if out >= max {
-            max = out;
+        if treemap.len() < 3 {
+            treemap.insert(out, out);
+        } else if out > *treemap.first_entry().unwrap().key() {
+            treemap.pop_first();
+            treemap.insert(out, out);
         }
 
         whole_elf = elf_iter.next();
     }
 
-    println!("{}", max);
+    let mut sum = 0;
+
+    for a in treemap.clone() {
+        sum += a.0;
+    }
+
+    println!("{:?} {}", treemap.last_key_value().unwrap().0, sum);
 
     Ok(())
 }
